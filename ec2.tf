@@ -4,7 +4,7 @@ resource "aws_instance" "backend" {
   security_groups = [aws_security_group.ec2_sg.name]
   user_data     = <<-EOF
                 #!/bin/bash
-                sudo yum install httpd
+                sudo yum install -y httpd
                 sudo systemctl start httpd
                 EOF
   tags = {
