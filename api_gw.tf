@@ -47,10 +47,11 @@ resource "aws_lambda_function" "auth_lambda" {
   function_name = "mtls-auth-lambda"
   role          = aws_iam_role.lambda_exec.arn
   runtime       = "python3.8"
-  handler       = "lambda_function.lambda_handler"
-  filename      = "lambda_function.zip"
+  handler       = "index.handler"
+  filename      = data.archive_file.lambda_package.output_path
+  source_code_hash = data.archive_file.lambda_package.output_base64sha256
 
-  depends_on = [data.archive_file.lambda_package]
+  depends_on = [data.archive_file.lambda_package]  # Ensures ZIP exists before Lambda is created
 }
 
 resource "aws_api_gateway_deployment" "deploy" {
