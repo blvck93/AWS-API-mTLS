@@ -14,7 +14,7 @@ resource "aws_api_gateway_domain_name" "api-blvck" {
   endpoint_configuration {
     types = ["REGIONAL"]
   }
-  
+
   mutual_tls_authentication {
     truststore_uri     = "s3://blvck9-c33rts00re2025/trust-store-cert.pem"
     truststore_version = "LATEST"
@@ -34,7 +34,7 @@ resource "aws_api_gateway_integration" "alb_integration" {
   http_method = aws_api_gateway_method.get_method.http_method
   integration_http_method = "POST"
   type = "HTTP"
-  uri = "https://${aws_lb.alb.dns_name}"  # Replace with ALB DNS name
+  uri = "https://${aws_lb.api_alb.dns_name}"  # Replace with ALB DNS name
 
   request_parameters = {
     "integration.request.header.client-certificate" = "method.request.header.x-client-cert"
@@ -54,7 +54,7 @@ resource "aws_lambda_function" "auth_lambda" {
 
 resource "aws_api_gateway_deployment" "deploy" {
   rest_api_id = aws_api_gateway_rest_api.api.id
-  depends_on = [aws_api_gateway_integration.lambda_integration]
+  depends_on = [aws_api_gateway_integration.alb_integration]
 }
 
 resource "aws_api_gateway_client_certificate" "client_cert" {
@@ -67,8 +67,6 @@ resource "aws_api_gateway_stage" "stage" {
   deployment_id = aws_api_gateway_deployment.deploy.id
   client_certificate_id = aws_api_gateway_client_certificate.client_cert.id
 }
-
-
 
 resource "aws_api_gateway_base_path_mapping" "mapping" {
   api_id      = aws_api_gateway_rest_api.api.id
