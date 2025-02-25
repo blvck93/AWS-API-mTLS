@@ -5,11 +5,6 @@ resource "aws_api_gateway_rest_api" "api" {
   endpoint_configuration {
     types = ["REGIONAL"]
   }
-
-  mutual_tls_authentication {
-    truststore_uri     = "s3://blvck9-c33rts00re2025/trust-store-cert.pem"
-    truststore_version = "LATEST"
-  }
 }
 
 resource "aws_api_gateway_domain_name" "api-blvck" {
@@ -18,6 +13,11 @@ resource "aws_api_gateway_domain_name" "api-blvck" {
   
   endpoint_configuration {
     types = ["REGIONAL"]
+  }
+  
+  mutual_tls_authentication {
+    truststore_uri     = "s3://blvck9-c33rts00re2025/trust-store-cert.pem"
+    truststore_version = "LATEST"
   }
 }
 
