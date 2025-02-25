@@ -6,14 +6,6 @@ resource "aws_api_gateway_rest_api" "api" {
   }
 }
 
-resource "aws_api_gateway_domain_name" "custom" {
-  domain_name     = "api.blvck.ovh"
-  regional_certificate_arn = "arn:aws:acm:us-east-1:033302958463:certificate/6ec35a57-6b94-4552-98ea-41122e370937"
-  endpoint_configuration {
-    types = ["EDGE"]
-  }
-}
-
 resource "aws_api_gateway_authorizer" "lambda" {
   name                   = "mtls-authorizer"
   rest_api_id            = aws_api_gateway_rest_api.api.id
@@ -37,20 +29,30 @@ resource "aws_api_gateway_stage" "stage" {
   client_certificate_id = aws_api_gateway_client_certificate.client_cert.id
 }
 
-resource "aws_api_gateway_client_certificate" "client_cert" {
-  description = "mTLS Trust Store Certificate"
+
+resource "aws_apigatewayv2_domain_name" "api-blvck" {
+  domain_name = "api.blvck.ovh"
+
+  domain_name_configuration {
+    certificate_arn = "arn:aws:acm:us-east-1:033302958463:certificate/6ec35a57-6b94-4552-98ea-41122e370937"
+    endpoint_type   = "EDGE"
+    security_policy = "TLS_1_2"
+  }
+
+  mutual_tls_authentication {
+    truststore_uri = "s3://blvck9-c33rts00re2025/trust-store-cert.pem"
+  }
 }
 
-resource "aws_s3_object" "trust_store" {
-  bucket = "blvck9-c33rts00re2025"
-  key    = "trust-store-cert.pem"
-  source = "./trust-store-cert.pem"
-}
-
-
-resource "aws_api_gateway_mutual_tls_authentication" "mtls" {
-  truststore_uri = "s3://blvck9-c33rts00re2025/trust-store-cert.pem"
-  rest_api_id = aws_api_gateway_rest_api.api.id
+resource "aws_route53_record" "dns" {
+  zone_id = data.aws_route53_zone.blvckovh
+  name    = aws_apigatewayv2_domain_name.api-blvck.domain_name
+  type    = "A"
+  alias {
+    name                   = aws_api_gateway_domain_name.custom.cloudfront_domain_name
+    zone_id                = aws_api_gateway_domain_name.custom.cloudfront_zone_id
+    evaluate_target_health = false
+  }
 }
 
 resource "aws_api_gateway_base_path_mapping" "mapping" {
