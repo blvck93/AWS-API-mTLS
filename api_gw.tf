@@ -8,15 +8,10 @@ resource "aws_api_gateway_rest_api" "api" {
 
 resource "aws_api_gateway_domain_name" "api-blvck" {
   domain_name = "api.blvck.ovh"
-
-  domain_name_configuration {
-    certificate_arn = "arn:aws:acm:us-east-1:033302958463:certificate/6ec35a57-6b94-4552-98ea-41122e370937"
-    endpoint_type   = "REGIONAL"
-    security_policy = "TLS_1_2"
-  }
-
-  mutual_tls_authentication {
-    truststore_uri = "s3://blvck9-c33rts00re2025/trust-store-cert.pem"
+  regional_certificate_arn = "arn:aws:acm:us-east-1:033302958463:certificate/6ec35a57-6b94-4552-98ea-41122e370937"
+  
+  endpoint_configuration {
+    types = ["EDGE"]
   }
 }
 
