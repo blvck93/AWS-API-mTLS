@@ -1,35 +1,3 @@
-resource "aws_api_gateway_rest_api" "api" {
-  name        = "mtls-api"
-  description = "API Gateway with mTLS and Lambda authorizer"
-  endpoint_configuration {
-    types = ["EDGE"]
-  }
-}
-
-resource "aws_api_gateway_authorizer" "lambda" {
-  name                   = "mtls-authorizer"
-  rest_api_id            = aws_api_gateway_rest_api.api.id
-  authorizer_uri         = aws_lambda_function.auth_lambda.invoke_arn
-  authorizer_result_ttl_in_seconds = 300
-  type                   = "REQUEST"
-}
-
-resource "aws_api_gateway_method" "proxy" {
-  rest_api_id   = aws_api_gateway_rest_api.api.id
-  resource_id   = aws_api_gateway_rest_api.api.root_resource_id
-  http_method   = "POST"
-  authorization = "CUSTOM"
-  authorizer_id = aws_api_gateway_authorizer.lambda.id
-}
-
-resource "aws_api_gateway_stage" "stage" {
-  deployment_id = aws_api_gateway_deployment.deploy.id
-  rest_api_id   = aws_api_gateway_rest_api.api.id
-  stage_name    = "prod"
-  client_certificate_id = aws_api_gateway_client_certificate.client_cert.id
-}
-
-
 resource "aws_apigatewayv2_domain_name" "api-blvck" {
   domain_name = "api.blvck.ovh"
 
@@ -55,8 +23,41 @@ resource "aws_route53_record" "dns" {
   }
 }
 
+resource "aws_api_gateway_deployment" "deploy" {
+  rest_api_id = aws_api_gateway_rest_api.api.id
+  stage_name  = "prod"
+}
+
+resource "aws_api_gateway_client_certificate" "client_cert" {
+  description = "Client certificate for mTLS"
+}
+
+resource "aws_api_gateway_authorizer" "lambda" {
+  name                   = "mtls-authorizer"
+  rest_api_id            = aws_apigatewayv2_domain_name.api-blvck.id
+  authorizer_uri         = aws_lambda_function.auth_lambda.invoke_arn
+  authorizer_result_ttl_in_seconds = 300
+  type                   = "REQUEST"
+}
+
+resource "aws_api_gateway_method" "proxy" {
+  rest_api_id   = aws_apigatewayv2_domain_name.api-blvck.id
+  resource_id   = aws_apigatewayv2_domain_name.api-blvck.root_resource_id
+  http_method   = "POST"
+  authorization = "CUSTOM"
+  authorizer_id = aws_api_gateway_authorizer.lambda.id
+}
+
+resource "aws_api_gateway_stage" "stage" {
+  deployment_id = aws_api_gateway_deployment.deploy.id
+  rest_api_id   = aws_apigatewayv2_domain_name.api-blvck.id
+  stage_name    = "prod"
+  client_certificate_id = aws_api_gateway_client_certificate.client_cert.id
+}
+
+
 resource "aws_api_gateway_base_path_mapping" "mapping" {
-  api_id      = aws_api_gateway_rest_api.api.id
+  api_id      = aws_apigatewayv2_domain_name.api-blvck.id
   stage_name  = aws_api_gateway_stage.stage.stage_name
   domain_name = aws_api_gateway_domain_name.custom.domain_name
 }
