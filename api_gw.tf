@@ -6,7 +6,7 @@ resource "aws_api_gateway_rest_api" "api" {
   }
 }
 
-resource "aws_apigateway_domain_name" "api-blvck" {
+resource "aws_api_gateway_domain_name" "api-blvck" {
   domain_name = "api.blvck.ovh"
 
   domain_name_configuration {
