@@ -35,10 +35,6 @@ resource "aws_api_gateway_integration" "alb_integration" {
   integration_http_method = "POST"
   type = "HTTP"
   uri = "https://${aws_lb.api_alb.dns_name}"  
-
-  request_parameters = {
-    "integration.request.header.client-certificate" = "method.request.header.x-client-cert"
-  }
 }
 
 resource "aws_lambda_function" "auth_lambda" {
