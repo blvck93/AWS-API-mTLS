@@ -39,7 +39,7 @@ resource "aws_lambda_function" "auth_lambda" {
   runtime       = "python3.8"
   handler       = "lambda_function.lambda_handler"
   filename      = "lambda_function.zip"
-  source_code_hash = filebase64sha256("lambda_function.zip")
+#  source_code_hash = filebase64sha256("lambda_function.zip")
 }
 
 resource "aws_api_gateway_method" "get_method" {
