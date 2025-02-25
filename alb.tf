@@ -3,14 +3,14 @@ resource "aws_lb" "api_alb" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb_sg.id]
-  subnets            = [data.aws_subnet.subnet-lab-1, data.aws_subnet.subnet-lab-2]
+  subnets            = [data.aws_subnet.subnet-lab-1.id, data.aws_subnet.subnet-lab-2.id]
 }
 
 resource "aws_lb_target_group" "api_tg" {
   name     = "api-tg"
   port     = 80
   protocol = "HTTP"
-  vpc_id   = data.aws_vpc.vpc-lab
+  vpc_id   = data.aws_vpc.vpc-lab.id
 }
 
 resource "aws_lb_listener" "https" {
