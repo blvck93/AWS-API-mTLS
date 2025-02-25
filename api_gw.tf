@@ -39,10 +39,19 @@ resource "aws_lambda_function" "auth_lambda" {
   runtime       = "python3.8"
   handler       = "lambda_function.lambda_handler"
   filename      = "lambda_function.zip"
+  source_code_hash = filebase64sha256("lambda_function.zip")
+}
+
+resource "aws_api_gateway_method" "get_method" {
+  rest_api_id   = aws_api_gateway_rest_api.api.id
+  resource_id   = aws_api_gateway_rest_api.api.root_resource_id
+  http_method   = "GET"
+  authorization = "NONE"
 }
 
 resource "aws_api_gateway_deployment" "deploy" {
   rest_api_id = aws_api_gateway_rest_api.api.id
+  depends_on = [aws_api_gateway_method.get_method]
 }
 
 resource "aws_api_gateway_client_certificate" "client_cert" {
@@ -55,6 +64,7 @@ resource "aws_api_gateway_stage" "stage" {
   deployment_id = aws_api_gateway_deployment.deploy.id
   client_certificate_id = aws_api_gateway_client_certificate.client_cert.id
 }
+
 
 resource "aws_api_gateway_base_path_mapping" "mapping" {
   api_id      = aws_api_gateway_rest_api.api.id
