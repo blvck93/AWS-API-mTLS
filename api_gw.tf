@@ -16,12 +16,13 @@ resource "aws_api_gateway_domain_name" "api-blvck" {
 }
 
 resource "aws_route53_record" "api-blvck-A" {
-  name    = aws_api_gateway_domain_name.api-blvck.cloudfront_domain_name
+  name    = aws_api_gateway_domain_name.api-blvck.regional_domain_name
   type    = "A"
-  zone_id = aws_api_gateway_domain_name.api-blvck.cloudfront_zone_id
+  zone_id = aws_api_gateway_domain_name.api-blvck.regional_zone_id
+
   alias {
-    name                   = aws_api_gateway_domain_name.api-blvck.cloudfront_domain_name
-    zone_id                = aws_api_gateway_domain_name.api-blvck.cloudfront_zone_id
+    name                   = aws_api_gateway_domain_name.api-blvck.regional_domain_name
+    zone_id                = aws_api_gateway_domain_name.api-blvck.regional_zone_id
     evaluate_target_health = false
   }
 }
@@ -48,6 +49,8 @@ resource "aws_lambda_function" "auth_lambda" {
   runtime       = "python3.8"
   handler       = "lambda_function.lambda_handler"
   filename      = "lambda_function.zip"
+
+  depends_on = [data.archive_file.lambda_package]
 }
 
 resource "aws_api_gateway_deployment" "deploy" {
