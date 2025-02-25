@@ -17,7 +17,7 @@ resource "aws_lb_target_group" "api_tg" {
     enabled             = true
     interval            = 30
     timeout             = 5
-    path                = "/health"  # This path should be implemented in Lambda
+    path                = "/"  # This path should be implemented in Lambda
     matcher             = "200"
   }
 }
