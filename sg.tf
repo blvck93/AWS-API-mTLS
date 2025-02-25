@@ -1,7 +1,7 @@
 resource "aws_security_group" "ec2_sg" {
   name        = "ec2-sg"
   description = "Security group for EC2 instance"
-  vpc_id      = var.vpc_id.id
+  vpc_id      = var.vpc_id
 
   ingress {
     from_port   = 80
@@ -35,7 +35,7 @@ resource "aws_security_group" "ec2_sg" {
 resource "aws_security_group" "alb_sg" {
   name        = "alb-sg"
   description = "Security group for Application LB"
-  vpc_id = var.vpc_id.id
+  vpc_id = var.vpc_id
 
   ingress {
     from_port   = 443

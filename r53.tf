@@ -1,5 +1,5 @@
 resource "aws_route53_record" "dns" {
-  zone_id = data.aws_route53_zone.blvckovh.id
+  zone_id = data.aws_route53_zone.blvckovh
   name    = "api.blvck.ovh"
   type    = "A"
   alias {
