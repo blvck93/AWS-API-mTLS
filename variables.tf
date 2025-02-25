@@ -15,9 +15,3 @@ variable "subnet2_id" {
   type        = string
   default     = "subnet-07c282a6ad15f5cb2"  
 }
-
-variable "r53zone_id" {
-  description = "The ID of the existing R53 zone"
-  type        = string
-  default     = "Z052570039KEMOWJVBXUV"  
-}

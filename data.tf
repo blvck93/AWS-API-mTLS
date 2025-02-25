@@ -11,5 +11,6 @@ data "aws_subnet" "subnet-lab-2" {
 }
 
 data "aws_route53_zone" "blvckovh" {
-  id = var.r53zone_id
+  name         = "blvck.ovh."
+private_zone = false
 }

@@ -3,7 +3,7 @@ resource "aws_apigatewayv2_domain_name" "api-blvck" {
 
   domain_name_configuration {
     certificate_arn = "arn:aws:acm:us-east-1:033302958463:certificate/6ec35a57-6b94-4552-98ea-41122e370937"
-    endpoint_type   = "EDGE"
+    endpoint_type   = "REGIONAL"
     security_policy = "TLS_1_2"
   }
 
@@ -15,7 +15,7 @@ resource "aws_apigatewayv2_domain_name" "api-blvck" {
 resource "aws_route53_record" "api-blvck-A" {
   name    = aws_apigatewayv2_domain_name.api-blvck.domain_name
   type    = "A"
-  zone_id = data.aws_route53_zone.blvckovh
+  zone_id = data.aws_route53_zone.blvckovh.zone_id
 
   alias {
     name                   = aws_apigatewayv2_domain_name.api-blvck.domain_name_configuration[0].target_domain_name
