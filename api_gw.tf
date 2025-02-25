@@ -61,3 +61,29 @@ resource "aws_api_gateway_base_path_mapping" "mapping" {
   stage_name  = aws_api_gateway_stage.stage.stage_name
   domain_name = aws_api_gateway_domain_name.api-blvck.domain_name
 }
+
+
+data "archive_file" "lambda_package" {
+  type        = "zip"
+  output_path = "lambda.zip"
+
+  source {
+    content  = <<EOF
+import json
+def handler(event, context):
+    headers = event.get('headers', {})
+    client_cert = headers.get('x-client-cert')
+    thumbprint = extract_thumbprint(client_cert) if client_cert else "Unknown"
+    return {
+        "isAuthorized": True,
+        "context": {
+            "thumbprint": thumbprint
+        }
+    }
+
+def extract_thumbprint(cert):
+    return cert[-40:]  # Simulated extraction
+EOF
+    filename = "index.py"
+  }
+}
