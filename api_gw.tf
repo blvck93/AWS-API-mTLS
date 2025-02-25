@@ -1,4 +1,4 @@
-resource "aws_apigatewayv2_domain_name" "api-blvck" {
+resource "aws_apigateway_domain_name" "api-blvck" {
   domain_name = "api.blvck.ovh"
 
   domain_name_configuration {
@@ -13,13 +13,13 @@ resource "aws_apigatewayv2_domain_name" "api-blvck" {
 }
 
 resource "aws_route53_record" "api-blvck-A" {
-  name    = aws_apigatewayv2_domain_name.api-blvck.domain_name
+  name    = aws_api_gateway_domain_name.api-blvck.domain_name
   type    = "A"
   zone_id = data.aws_route53_zone.blvckovh.zone_id
 
   alias {
-    name                   = aws_apigatewayv2_domain_name.api-blvck.domain_name_configuration[0].target_domain_name
-    zone_id                = aws_apigatewayv2_domain_name.api-blvck.domain_name_configuration[0].hosted_zone_id
+    name                   = aws_api_gateway_domain_name.api-blvck.domain_name_configuration[0].target_domain_name
+    zone_id                = aws_api_gateway_domain_name.api-blvck.domain_name_configuration[0].hosted_zone_id
     evaluate_target_health = false
   }
 }
