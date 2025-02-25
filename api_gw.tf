@@ -10,6 +10,7 @@ resource "aws_api_gateway_rest_api" "api" {
 resource "aws_api_gateway_domain_name" "api-blvck" {
   domain_name = "api.blvck.ovh"
   regional_certificate_arn = "arn:aws:acm:us-east-1:033302958463:certificate/6ec35a57-6b94-4552-98ea-41122e370937"
+  security_policy = "TLS_1_2"
   
   endpoint_configuration {
     types = ["REGIONAL"]
