@@ -18,7 +18,7 @@ resource "aws_api_gateway_domain_name" "api-blvck" {
 
   mutual_tls_authentication {
     truststore_uri     = "s3://blvck9-c33rts00re2025/trust-store-cert.pem"
-    truststore_version = "LATEST"
+ #   truststore_version = "LATEST"
   }
 }
 
