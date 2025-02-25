@@ -15,18 +15,6 @@ resource "aws_api_gateway_domain_name" "api-blvck" {
   }
 }
 
-resource "aws_route53_record" "api-blvck-A" {
-  name    = aws_api_gateway_domain_name.api-blvck.regional_domain_name
-  type    = "A"
-  zone_id = aws_api_gateway_domain_name.api-blvck.regional_zone_id
-
-  alias {
-    name                   = aws_api_gateway_domain_name.api-blvck.regional_domain_name
-    zone_id                = aws_api_gateway_domain_name.api-blvck.regional_zone_id
-    evaluate_target_health = false
-  }
-}
-
 resource "aws_api_gateway_method" "get_method" {
   rest_api_id   = aws_api_gateway_rest_api.api.id
   resource_id   = aws_api_gateway_rest_api.api.root_resource_id
@@ -128,3 +116,37 @@ resource "aws_iam_policy_attachment" "lambda_policy" {
   roles      = [aws_iam_role.lambda_exec.name]
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
+
+# resource "aws_route53_record" "api-blvck-A" {
+#   name    = aws_api_gateway_domain_name.api-blvck.regional_domain_name
+#   type    = "A"
+#   zone_id = aws_api_gateway_domain_name.api-blvck.regional_zone_id
+# 
+#   alias {
+#     name                   = aws_api_gateway_domain_name.api-blvck.regional_domain_name
+#     zone_id                = aws_api_gateway_domain_name.api-blvck.regional_zone_id
+#     evaluate_target_health = false
+#   }
+# }
+# 
+# resource "aws_iam_role_policy" "route53_policy" {
+#   name = "route53_access_policy"
+#   role = aws_iam_role.lambda_exec.id
+#   policy = <<EOF
+# {
+#   "Version": "2012-10-17",
+#   "Statement": [
+#     {
+#       "Effect": "Allow",
+#       "Action": [
+#         "route53:ListHostedZones",
+#         "route53:GetHostedZone",
+#         "route53:ChangeResourceRecordSets",
+#         "route53:ListResourceRecordSets"
+#       ],
+#       "Resource": "*"
+#     }
+#   ]
+# }
+# EOF
+# }
