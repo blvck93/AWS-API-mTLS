@@ -1,8 +1,14 @@
 resource "aws_api_gateway_rest_api" "api" {
   name        = "mtls-api"
   description = "API Gateway with mTLS and Lambda authorizer"
+
   endpoint_configuration {
     types = ["REGIONAL"]
+  }
+
+  mutual_tls_authentication {
+    truststore_uri     = "s3://blvck9-c33rts00re2025/trust-store-cert.pem"
+    truststore_version = "LATEST"
   }
 }
 
@@ -22,13 +28,17 @@ resource "aws_api_gateway_method" "get_method" {
   authorization = "NONE"
 }
 
-resource "aws_api_gateway_integration" "lambda_integration" {
+resource "aws_api_gateway_integration" "alb_integration" {
   rest_api_id = aws_api_gateway_rest_api.api.id
   resource_id = aws_api_gateway_rest_api.api.root_resource_id
   http_method = aws_api_gateway_method.get_method.http_method
   integration_http_method = "POST"
-  type = "AWS_PROXY"
-  uri = aws_lambda_function.auth_lambda.invoke_arn
+  type = "HTTP"
+  uri = "https://${aws_lb.alb.dns_name}"  # Replace with ALB DNS name
+
+  request_parameters = {
+    "integration.request.header.client-certificate" = "method.request.header.x-client-cert"
+  }
 }
 
 resource "aws_lambda_function" "auth_lambda" {
@@ -73,20 +83,23 @@ data "archive_file" "lambda_package" {
 
   source {
     content  = <<EOF
-import json
+import hashlib
+
 def handler(event, context):
     headers = event.get('headers', {})
     client_cert = headers.get('x-client-cert')
-    thumbprint = extract_thumbprint(client_cert) if client_cert else "Unknown"
+    
+    if client_cert:
+        thumbprint = hashlib.md5(client_cert.encode()).hexdigest()
+    else:
+        thumbprint = "Unknown"
+
     return {
         "isAuthorized": True,
         "context": {
             "thumbprint": thumbprint
         }
     }
-
-def extract_thumbprint(cert):
-    return cert[-40:]  # Simulated extraction
 EOF
     filename = "index.py"
   }

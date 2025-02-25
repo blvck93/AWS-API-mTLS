@@ -4,7 +4,8 @@ resource "aws_instance" "backend" {
   security_groups = [aws_security_group.ec2_sg.name]
   user_data     = <<-EOF
                 #!/bin/bash
-                echo "Thumbprint: $THUMBPRINT" > /var/www/html/index.html
+                sudo yum install httpd
+                sudo systemctl start httpd
                 EOF
   tags = {
     Name = "mtls-backend-server"
