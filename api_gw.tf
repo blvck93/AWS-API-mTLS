@@ -54,7 +54,7 @@ resource "aws_api_gateway_integration" "alb_integration" {
   resource_id = aws_api_gateway_rest_api.api.root_resource_id
   http_method = aws_api_gateway_method.get_method.http_method
   integration_http_method = "POST"
-  type = "AWS_PROXY"
+  type = "HTTP"
   uri = "http://${aws_lb.api_alb.dns_name}"  
 }
 
