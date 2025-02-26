@@ -8,6 +8,7 @@ resource "aws_instance" "backend" {
                 #!/bin/bash
                 sudo yum install -y httpd
                 sudo systemctl start httpd
+                echo "Hello World from $(hostname -f)" > /var/www/html/index.html
                 EOF
   tags = {
     Name = "mtls-backend-server"
