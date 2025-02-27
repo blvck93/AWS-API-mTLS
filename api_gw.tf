@@ -71,7 +71,9 @@ resource "aws_lambda_function" "auth_lambda" {
 
 resource "aws_api_gateway_deployment" "deploy" {
   rest_api_id = aws_api_gateway_rest_api.api.id
-  depends_on = [aws_api_gateway_integration.alb_integration]
+  depends_on = [aws_api_gateway_integration.alb_integration, aws_api_gateway_method.get_method]
+
+  
 }
 
 resource "aws_api_gateway_client_certificate" "client_cert" {
@@ -132,7 +134,7 @@ resource "aws_iam_role" "lambda_exec" {
       "Principal": {
         "Service": "lambda.amazonaws.com"
       },
-      "Action": "lambda:InvokeFunction"
+      "Action": "sts:AssumeRole"
     }
   ]
 }
