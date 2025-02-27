@@ -132,7 +132,7 @@ resource "aws_iam_role" "lambda_exec" {
       "Principal": {
         "Service": "lambda.amazonaws.com"
       },
-      "Action": "sts:AssumeRole"
+      "Action": "lambda:InvokeFunction"
     }
   ]
 }
