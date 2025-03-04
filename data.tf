@@ -10,7 +10,7 @@ data "aws_subnet" "subnet-lab-2" {
   id = var.subnet2_id
 }
 
-data "aws_api_gateway_domain_name" "domain_name" {
+data "aws_api_gateway_domain_name" "domain-ext" {
   domain_name = var.domain_name
 }
 
