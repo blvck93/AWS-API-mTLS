@@ -6,10 +6,15 @@ resource "aws_instance" "backend" {
   subnet_id = data.aws_subnet.subnet-lab-1.id
   user_data     = <<-EOF
                 #!/bin/bash
-                sudo yum install -y httpd
+                sudo yum install -y httpd php php-cli php-common php-mbstring php-xml
                 sudo systemctl start httpd
-                echo "Hello World from $(hostname -f)" > /var/www/html/index.html
+                
+                echo '<?php foreach (getallheaders() as $name => $value) { echo "$name: $value<br>"; } ?>' > /var/www/html/index.php
+                
+                sudo systemctl restart httpd
                 EOF
+
+
   tags = {
     Name = "mtls-backend-server"
   }

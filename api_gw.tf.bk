@@ -1,3 +1,12 @@
+## @@ ++ custom domain mapping stage
+## @@ ++ header mapping from authenticator
+## @@ ++ authorization as authenticator
+## @@ ++ passtrough HTTP to alb (can be associated with R53 record)
+## you can add additional security in accessing alb
+## double check custom domain edge and mtls - it was not showing up https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-edge-optimized-custom-domain-name.html
+## parametryzacja certificate arn
+
+
 resource "aws_api_gateway_rest_api" "api" {
   name        = "mtls-api"
   description = "API Gateway with mTLS and Lambda authorizer"
