@@ -97,6 +97,34 @@ resource "aws_api_gateway_authorizer" "lambda" {
   identity_source        = "method.request.header.x-client-cert"
 }
 
+resource "aws_apigateway_account" "api_logging" {
+  cloudwatch_role_arn = aws_iam_role.api_gateway_logging.arn
+}
+
+resource "aws_iam_role" "api_gateway_logging" {
+  name = "APIGatewayLoggingRole"
+  
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "apigateway.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_policy_attachment" "api_logging_policy" {
+  name       = "APIGatewayLoggingAttachment"
+  roles      = [aws_iam_role.api_gateway_logging.name]
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+}
 
 # resource "aws_route53_record" "api-blvck-A" {
 #   name    = aws_api_gateway_domain_name.api-blvck.regional_domain_name
