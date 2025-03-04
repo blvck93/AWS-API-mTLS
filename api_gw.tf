@@ -39,10 +39,6 @@ resource "aws_api_gateway_method" "get_method" {
   http_method   = "GET"
   authorization = "CUSTOM"
   authorizer_id = aws_api_gateway_authorizer.lambda.id
-
-  request_parameters = {
-    "method.request.header.x-client-cert" = true
-  }
 }
 
 resource "aws_api_gateway_integration" "alb_integration" {
