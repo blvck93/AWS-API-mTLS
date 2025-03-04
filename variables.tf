@@ -23,7 +23,7 @@ variable "ext_cert_arn" {
 }
 
 variable "domain_name" {
-  description = "Domain name used for API GW cusotm domain"
+  description = "Domain name used for API GW custom domain"
   type        = string
   default     = "api.blvck.ovh"
 }
