@@ -97,7 +97,7 @@ resource "aws_api_gateway_authorizer" "lambda" {
   identity_source        = "method.request.header.x-client-cert"
 }
 
-resource "aws_apigateway_account" "api_logging" {
+resource "aws_api_gateway_account" "api_logging" {
   cloudwatch_role_arn = aws_iam_role.api_gateway_logging.arn
 }
 
