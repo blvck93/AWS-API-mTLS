@@ -17,7 +17,7 @@ resource "aws_api_gateway_rest_api" "api" {
 }
 
 resource "aws_api_gateway_domain_name" "api-blvck" {
-  domain_name = data.aws_api_gateway_domain_name.domain-ext.domain_name
+  domain_name = "api.blvck.ovh"
   regional_certificate_arn = data.aws_acm_certificate.cert-ext.arn
   security_policy = "TLS_1_2"
   
