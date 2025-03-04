@@ -39,6 +39,10 @@ resource "aws_api_gateway_method" "get_method" {
   http_method   = "GET"
   authorization = "CUSTOM"
   authorizer_id = aws_api_gateway_authorizer.lambda.id
+
+  request_parameters = {
+    "method.request.header.x-client-cert" = true
+  }
 }
 
 resource "aws_api_gateway_integration" "alb_integration" {
@@ -79,7 +83,10 @@ resource "aws_api_gateway_authorizer" "lambda" {
   rest_api_id            = aws_api_gateway_rest_api.api.id
   authorizer_uri         = aws_lambda_function.auth_lambda.invoke_arn
   authorizer_credentials = aws_iam_role.lambda_exec.arn
+  type                   = "REQUEST"
+  identity_source        = "method.request.header.x-client-cert"
 }
+
 
 # resource "aws_route53_record" "api-blvck-A" {
 #   name    = aws_api_gateway_domain_name.api-blvck.regional_domain_name

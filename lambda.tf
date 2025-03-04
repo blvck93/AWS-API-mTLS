@@ -16,22 +16,36 @@ data "archive_file" "lambda_package" {
   source {
     content  = <<EOF
 import hashlib
+import json
 
 def handler(event, context):
+    print("Received event:", json.dumps(event))  # Debugging logs
+
     headers = event.get('headers', {})
     client_cert = headers.get('x-client-cert')
-    
+
     if client_cert:
         thumbprint = hashlib.md5(client_cert.encode()).hexdigest()
     else:
         thumbprint = "Unknown"
 
     return {
-        "isAuthorized": True,
+        "principalId": thumbprint,  # Required for REST API authorizers
+        "policyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Action": "execute-api:Invoke",
+                    "Effect": "Allow",
+                    "Resource": event["methodArn"]  # Required for REST API
+                }
+            ]
+        },
         "context": {
             "thumbprint": thumbprint
         }
     }
+
 EOF
     filename = "index.py"
   }
