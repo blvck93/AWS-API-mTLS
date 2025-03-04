@@ -49,7 +49,7 @@ resource "aws_iam_role" "lambda_exec" {
       "Principal": {
         "Service": ["apigateway.amazonaws.com","lambda.amazonaws.com"]
       },
-      "Action": "sts:AssumeRole"
+      "Action": ["sts:AssumeRole","lambda:InvokeFunction"]
     }
   ]
 }
