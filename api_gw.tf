@@ -4,7 +4,7 @@
 ## @@ ++ passtrough HTTP to alb (can be associated with R53 record)
 ## you can add additional security in accessing alb
 ## double check custom domain edge and mtls - it was not showing up https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-edge-optimized-custom-domain-name.html
-## parametryzacja certificate arn x
+
 
 
 resource "aws_api_gateway_rest_api" "api" {
@@ -17,8 +17,8 @@ resource "aws_api_gateway_rest_api" "api" {
 }
 
 resource "aws_api_gateway_domain_name" "api-blvck" {
-  domain_name = "api.blvck.ovh"
-  regional_certificate_arn = "arn:aws:acm:us-east-1:033302958463:certificate/6ec35a57-6b94-4552-98ea-41122e370937"
+  domain_name = data.aws_api_gateway_domain_name.domain_name
+  regional_certificate_arn = data.aws_acm_certificate.cert-ext.arn
   security_policy = "TLS_1_2"
   
   endpoint_configuration {
@@ -26,16 +26,18 @@ resource "aws_api_gateway_domain_name" "api-blvck" {
   }
 
   mutual_tls_authentication {
-    truststore_uri     = "s3://blvck9-c33rts00re2025/trust-store-cert-github.pem"
+    truststore_uri = "s3://${data.aws_s3_object.truststore_cert.bucket}/${data.aws_s3_object.truststore_cert.key}"
  #   truststore_version = "LATEST"
   }
 }
+
 
 resource "aws_api_gateway_method" "get_method" {
   rest_api_id   = aws_api_gateway_rest_api.api.id
   resource_id   = aws_api_gateway_rest_api.api.root_resource_id
   http_method   = "GET"
-  authorization = "NONE"
+  authorization = "CUSTOM"
+  authorizer_id = aws_api_gateway_authorizer.lambda.id
 }
 
 resource "aws_api_gateway_integration" "alb_integration" {
@@ -67,6 +69,15 @@ resource "aws_api_gateway_base_path_mapping" "mapping" {
   api_id      = aws_api_gateway_rest_api.api.id
   stage_name  = aws_api_gateway_stage.stage.stage_name
   domain_name = aws_api_gateway_domain_name.api-blvck.domain_name
+
+  depends_on = [ aws_api_gateway_stage.stage ]
+}
+
+resource "aws_api_gateway_authorizer" "lambda" {
+  name                   = "lambda"
+  rest_api_id            = aws_api_gateway_rest_api.api.id
+  authorizer_uri         = aws_lambda_function.auth_lambda.invoke_arn
+  authorizer_credentials = aws_iam_role.lambda_exec.arn
 }
 
 # resource "aws_route53_record" "api-blvck-A" {
