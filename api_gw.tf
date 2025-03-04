@@ -54,6 +54,16 @@ resource "aws_api_gateway_integration" "alb_integration" {
   uri = "http://${aws_lb.api_alb.dns_name}"  
 }
 
+resource "aws_api_gateway_integration_request" "alb_add_header" {
+  rest_api_id = aws_api_gateway_rest_api.api.id
+  resource_id = aws_api_gateway_rest_api.api.root_resource_id
+  http_method = aws_api_gateway_method.get_method.http_method
+
+  request_parameters = {
+    "integration.request.header.X-Client-Thumbprint" = "method.request.header.x-client-cert"
+  }
+}
+
 resource "aws_api_gateway_deployment" "deploy" {
   rest_api_id = aws_api_gateway_rest_api.api.id
   depends_on = [aws_api_gateway_integration.alb_integration]
@@ -69,6 +79,7 @@ resource "aws_api_gateway_stage" "stage" {
   deployment_id = aws_api_gateway_deployment.deploy.id
   client_certificate_id = aws_api_gateway_client_certificate.client_cert.id
 }
+
 
 resource "aws_api_gateway_base_path_mapping" "mapping" {
   api_id      = aws_api_gateway_rest_api.api.id
