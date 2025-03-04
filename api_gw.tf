@@ -10,6 +10,7 @@
 resource "aws_api_gateway_rest_api" "api" {
   name        = "mtls-api"
   description = "API Gateway with mTLS and Lambda authorizer"
+  disable_execute_api_endpoint = true ### required for custom domain api mapping!!
 
   endpoint_configuration {
     types = ["REGIONAL"]
