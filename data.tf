@@ -12,5 +12,5 @@ data "aws_subnet" "subnet-lab-2" {
 
 data "aws_route53_zone" "blvckovh" {
   name         = "blvck.ovh."
-private_zone = false
+  private_zone = false
 }
