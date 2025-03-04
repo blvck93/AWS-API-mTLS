@@ -52,17 +52,20 @@ resource "aws_api_gateway_integration" "alb_integration" {
   integration_http_method = "POST"
   type = "HTTP"
   uri = "http://${aws_lb.api_alb.dns_name}"  
+  
+  request_templates = {
+    "application/json" = <<EOF
+{
+    "body": $input.json('$'),
+    "headers": {
+        "X-Client-Thumbprint": "$context.authorizer.thumbprint"
+    }
 }
-
-resource "aws_api_gateway_integration_request" "alb_add_header" {
-  rest_api_id = aws_api_gateway_rest_api.api.id
-  resource_id = aws_api_gateway_rest_api.api.root_resource_id
-  http_method = aws_api_gateway_method.get_method.http_method
-
-  request_parameters = {
-    "integration.request.header.X-Client-Thumbprint" = "method.request.header.x-client-cert"
+EOF
   }
 }
+
+
 
 resource "aws_api_gateway_deployment" "deploy" {
   rest_api_id = aws_api_gateway_rest_api.api.id
