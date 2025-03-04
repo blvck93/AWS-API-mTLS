@@ -21,9 +21,3 @@ variable "ext_cert_arn" {
   type        = string
   default     = "arn:aws:acm:us-east-1:033302958463:certificate/6ec35a57-6b94-4552-98ea-41122e370937"
 }
-
-variable "domain_name" {
-  description = "Domain name used for API GW cusotm domain"
-  type        = string
-  default     = "api.blvck.ovh"
-}
