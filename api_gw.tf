@@ -99,6 +99,8 @@ resource "aws_api_gateway_authorizer" "lambda" {
 
 resource "aws_api_gateway_account" "api_logging" {
   cloudwatch_role_arn = aws_iam_role.api_gateway_logging.arn
+
+  reset_on_delete = true
 }
 
 resource "aws_iam_role" "api_gateway_logging" {
