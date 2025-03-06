@@ -140,7 +140,7 @@ resource "aws_iam_policy_attachment" "api_logging_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
 }
 
-# resource "aws_route53_record" "api-blvck-A" {
+#  resource "aws_route53_record" "api-blvck-A" {
 #   name    = aws_api_gateway_domain_name.api-blvck.regional_domain_name
 #   type    = "A"
 #   zone_id = aws_api_gateway_domain_name.api-blvck.regional_zone_id
