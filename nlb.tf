@@ -1,11 +1,3 @@
-data "aws_subnet_ids" "nlb" {
-  vpc_id = var.vpc_id
-
-  tags = {
-    Tier = "Public"
-  }
-}
-
 resource "aws_lb" "nlb" {
   name               = "nlb-for-api-gw"
   internal           = true
