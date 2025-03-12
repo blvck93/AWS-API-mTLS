@@ -47,7 +47,10 @@ resource "aws_api_gateway_integration" "alb_integration" {
   http_method = aws_api_gateway_method.get_method.http_method
   integration_http_method = "ANY"
   type = "HTTP"
-  uri = "http://${aws_lb.api_alb.dns_name}"  
+#  uri = "http://${aws_lb.api_alb.dns_name}"  
+  uri         = "http://${aws_lb.nlb.dns_name}:80"
+  connection_type = "VPC_LINK"
+  connection_id    = aws_api_gateway_vpc_link.vpc_nlb.id
   
   request_templates = {
     "application/json" = <<EOF
@@ -73,6 +76,12 @@ resource "aws_api_gateway_integration_response" "MyDemoIntegrationResponse" {
   resource_id = aws_api_gateway_rest_api.api.root_resource_id
   http_method = aws_api_gateway_method.get_method.http_method
   status_code = aws_api_gateway_method_response.response_200.status_code
+}
+
+resource "aws_api_gateway_vpc_link" "vpc_nlb" {
+  name               = "vpc-to-nlb"
+  description        = "VPC Link for API Gateway to reach NLB"
+  target_arns        = [aws_lb.nlb.arn]
 }
 
 resource "aws_api_gateway_deployment" "deploy" {
