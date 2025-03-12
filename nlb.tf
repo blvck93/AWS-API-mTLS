@@ -26,15 +26,6 @@ resource "aws_lb_target_group" "nlb_tg" {
   protocol = "TCP"
   target_type = "alb"
   vpc_id   = data.aws_vpc.vpc-lab.id
-
-
-  health_check {
-    enabled             = true
-    interval            = 30
-    timeout             = 5
-    path                = "/" 
-    matcher             = "200"
-  }
 }
 
 resource "aws_lb_target_group_attachment" "nlb_tg_attachment" {
