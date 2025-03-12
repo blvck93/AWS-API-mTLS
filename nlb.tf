@@ -7,7 +7,8 @@ data "aws_subnet_ids" "nlb" {
 }
 
 resource "aws_lb" "nlb" {
-  name               = "NLB for API GW"
+  name               = "nlb-for-api-gw"
+  internal           = true
   load_balancer_type = "network"
   subnets            = [data.aws_subnet.subnet-lab-1.id, data.aws_subnet.subnet-lab-2.id]
 
