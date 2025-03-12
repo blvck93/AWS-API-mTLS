@@ -23,7 +23,7 @@ resource "aws_lb_listener" "nlb" {
 resource "aws_lb_target_group" "nlb_tg" {
   name     = "nlb-tg"
   port     = 80
-  protocol = "HTTP"
+  protocol = "TCP"
   vpc_id   = data.aws_vpc.vpc-lab.id
 
 
