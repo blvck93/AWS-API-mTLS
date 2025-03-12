@@ -24,6 +24,7 @@ resource "aws_lb_target_group" "nlb_tg" {
   name     = "nlb-tg"
   port     = 80
   protocol = "TCP"
+  target_type = "alb"
   vpc_id   = data.aws_vpc.vpc-lab.id
 
 
