@@ -9,8 +9,7 @@ resource "aws_lb" "nlb" {
 
 resource "aws_lb_listener" "nlb" {
   load_balancer_arn = aws_lb.nlb.arn
-
-  protocol = "TCP"
+  protocol = "HTTP"
   port     = 80
 
   default_action {
