@@ -57,7 +57,7 @@ resource "aws_api_gateway_integration" "alb_integration" {
 {
     "body": $input.json('$'),
     "headers": {
-        "X-Client-Thumbprint": "$context.authorizer.thumbprint"
+        "X-Client-Cert-Thumbprint": "$context.authorizer.certThumbprint"
     }
 }
 EOF

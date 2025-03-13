@@ -57,80 +57,73 @@ data "archive_file" "lambda_package" {
 
   source {
     content  = <<EOF
-import boto3
 import hashlib
+from cryptography.hazmat.primitives import serialization
+from cryptography.x509 import load_pem_x509_certificate
 import base64
-import OpenSSL
 
-def calculate_md5_hash(thumbprint):
-    """Calculate the MD5 hash of a given thumbprint."""
-    return hashlib.md5(thumbprint.encode()).hexdigest()
-
-def extract_thumbprint(cert_pem):
-    """Extract the thumbprint from a certificate PEM."""
-    cert = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, cert_pem)
-    thumbprint = OpenSSL.crypto.dump_certificate(OpenSSL.crypto.FILETYPE_PEM, cert).decode().strip()
-    # Extract the actual thumbprint (SHA1 hash of the DER-encoded certificate)
-    # This step may vary based on how you want to handle the thumbprint
-    # Here, we directly use the SHA1 hash as the thumbprint for simplicity
-    thumbprint_sha1 = hashlib.sha1(OpenSSL.crypto.dump_certificate(OpenSSL.crypto.FILETYPE_ASN1, cert)).hexdigest()
-    return thumbprint_sha1
+def calculate_thumbprint(pem_data: str, hash_algorithm: str = 'SHA-1') -> str:
+    """
+    Calculate certificate thumbprint from PEM-encoded data.
+    Defaults to SHA-1 (common for MTLS), but supports SHA-256.
+    """
+    # Load certificate from PEM
+    cert = load_pem_x509_certificate(pem_data.encode('utf-8'))
+    
+    # Get DER-encoded bytes
+    der_bytes = cert.public_bytes(encoding=serialization.Encoding.DER)
+    
+    # Calculate hash
+    if hash_algorithm.upper() == 'SHA-1':
+        digest = hashlib.sha1(der_bytes).digest()
+    elif hash_algorithm.upper() == 'SHA-256':
+        digest = hashlib.sha256(der_bytes).digest()
+    else:
+        raise ValueError(f"Unsupported hash algorithm: {hash_algorithm}")
+    
+    # Convert to hex string (uppercase without colons)
+    return digest.hex().upper()
 
 def lambda_handler(event, context):
-    """Lambda authorizer function."""
     try:
-        # Assuming event contains the certificate PEM or its thumbprint
-        # Adjust based on actual event structure
-        cert_pem = event.get('protocolData', {}).get('tls', {}).get('x509CertificatePem')
-       
-        if cert_pem:
-            thumbprint = extract_thumbprint(cert_pem)
-            md5_hash = calculate_md5_hash(thumbprint)
-           
-            # Return the MD5 hash as part of the authorization context
-            return {
-                'policyDocument': {
-                    'Version': '2012-10-17',
-                    'Statement': [
-                        {
-                            'Action': 'execute-api:Invoke',
-                            'Resource': event['methodArn'],
-                            'Effect': 'Allow'
-                        }
-                    ]
-                },
-                'context': {
-                    'md5ThumbprintHash': md5_hash
-                }
-            }
-        else:
-            # Handle the case where the certificate PEM is not available
-            return {
-                'policyDocument': {
-                    'Version': '2012-10-17',
-                    'Statement': [
-                        {
-                            'Action': 'execute-api:Invoke',
-                            'Resource': event['methodArn'],
-                            'Effect': 'Deny'
-                        }
-                    ]
-                }
-            }
-    except Exception as e:
-        print(f"Error occurred: {e}")
+        # Extract client certificate from API Gateway event
+        client_cert_pem = event['requestContext']['identity']['clientCert']['clientCertPem']
+        
+        # Calculate thumbprint (default SHA-1)
+        thumbprint = calculate_thumbprint(client_cert_pem)
+        
         return {
-            'policyDocument': {
-                'Version': '2012-10-17',
-                'Statement': [
-                    {
-                        'Action': 'execute-api:Invoke',
-                        'Resource': event['methodArn'],
-                        'Effect': 'Deny'
-                    }
-                ]
+            "principalId": "mtls-user",
+            "policyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [{
+                    "Action": "execute-api:Invoke",
+                    "Effect": "Allow",
+                    "Resource": event['methodArn']
+                }]
+            },
+            "context": {
+                "certThumbprint": thumbprint
             }
         }
+    
+    except KeyError:
+        return {
+            "principalId": "anonymous",
+            "policyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [{
+                    "Action": "execute-api:Invoke",
+                    "Effect": "Deny",
+                    "Resource": event['methodArn']
+                }]
+            },
+            "context": {}
+        }
+    
+    except Exception as e:
+        print(f"Error processing certificate: {str(e)}")
+        raise
 
 EOF
     filename = "index.py"
