@@ -47,10 +47,10 @@ resource "aws_api_gateway_integration" "alb_integration" {
   http_method = aws_api_gateway_method.get_method.http_method
   integration_http_method = "GET"
   type = "HTTP"
-#  uri = "http://${aws_lb.api_alb.dns_name}"  
-  uri         = "http://${aws_lb.nlb.dns_name}:80"
-  connection_type = "VPC_LINK"
-  connection_id    = aws_api_gateway_vpc_link.vpc_nlb.id
+  uri = "http://${aws_lb.api_alb.dns_name}"  
+#  uri         = "http://${aws_lb.alb.dns_name}:80"
+#  connection_type = "VPC_LINK"
+#  connection_id    = aws_api_gateway_vpc_link.vpc_nlb.id
   
   request_templates = {
     "application/json" = <<EOF
@@ -80,11 +80,11 @@ resource "aws_api_gateway_integration_response" "MyIntegration" {
   depends_on = [aws_api_gateway_integration.alb_integration]
 }
 
-resource "aws_api_gateway_vpc_link" "vpc_nlb" {
-  name               = "vpc-to-nlb"
-  description        = "VPC Link for API Gateway to reach NLB"
-  target_arns        = [aws_lb.nlb.arn]
-}
+#resource "aws_api_gateway_vpc_link" "vpc_nlb" {
+#  name               = "vpc-to-nlb"
+#  description        = "VPC Link for API Gateway to reach NLB"
+#  target_arns        = [aws_lb.nlb.arn]
+#}
 
 resource "aws_api_gateway_deployment" "deploy" {
   rest_api_id = aws_api_gateway_rest_api.api.id
