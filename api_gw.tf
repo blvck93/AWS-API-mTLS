@@ -117,6 +117,7 @@ resource "aws_api_gateway_authorizer" "lambda" {
   authorizer_uri         = aws_lambda_function.auth_lambda.invoke_arn
   authorizer_credentials = aws_iam_role.lambda_exec.arn
   type                   = "TOKEN"
+# Source of the identity in an incoming request
 #  identity_source        = "method.request.header.x-client-cert"
 }
 
