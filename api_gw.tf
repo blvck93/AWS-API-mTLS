@@ -52,6 +52,10 @@ resource "aws_api_gateway_integration" "alb_integration" {
 #  connection_type = "VPC_LINK"
 #  connection_id    = aws_api_gateway_vpc_link.vpc_nlb.id
   
+  request_parameters = {
+    "integration.request.header.cert-thumbprint" = "context.authorizer.certThumbprint"
+  }
+
   request_templates = {
     "application/json" = <<EOF
 {
