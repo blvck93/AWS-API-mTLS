@@ -1,18 +1,25 @@
+# Fetch the S3 object metadata including hash
+data "aws_s3_object" "lambda_zip" {
+  bucket = "blvck9-c33rts00re2025"
+  key    = "lambda_function.zip"
+}
+
 resource "aws_lambda_function" "auth_lambda" {
   function_name    = "mtls-auth-lambda"
   role            = aws_iam_role.lambda_exec.arn
   runtime         = "python3.12"
   handler         = "lambda_function.lambda_handler"
 
-  # S3 Bucket and Key for deployment
+  # Use S3 for Lambda deployment
   s3_bucket       = "blvck9-c33rts00re2025"
   s3_key          = "lambda_function.zip"
 
-  # Automatically update the function if the code changes
-  source_code_hash = filebase64sha256("lambda_function.zip")
+  # Get the base64 hash from S3 object (ensures updates on code changes)
+  source_code_hash = data.aws_s3_object.lambda_zip.etag
 
   depends_on = [aws_iam_role.lambda_exec]
 }
+
 
 resource "aws_iam_role" "lambda_exec" {
   name = "lambda_exec_role"
