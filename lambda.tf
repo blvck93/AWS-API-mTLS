@@ -17,6 +17,10 @@ resource "aws_lambda_function" "auth_lambda" {
   # Get the base64 hash from S3 object (ensures updates on code changes)
   source_code_hash = data.aws_s3_object.lambda_zip.etag
 
+  layers = [
+    "arn:aws:lambda:us-east-1:770693421928:layer:Klayers-p312-cryptography:1"
+  ]
+  
   depends_on = [aws_iam_role.lambda_exec]
 }
 
