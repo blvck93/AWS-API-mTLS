@@ -1,9 +1,3 @@
-# Fetch the S3 object metadata 
-data "aws_s3_object" "lambda_zip" {
-  bucket = "blvck9-c33rts00re2025"
-  key    = "lambda_function.zip"
-}
-
 resource "aws_lambda_function" "auth_lambda" {
   function_name    = "mtls-auth-lambda"
   role            = aws_iam_role.lambda_exec.arn

@@ -24,3 +24,9 @@ data "aws_route53_zone" "blvckovh" {
   name         = "blvck.ovh."
   private_zone = false
 }
+
+# Fetch the S3 object metadata 
+data "aws_s3_object" "lambda_zip" {
+  bucket = "blvck9-c33rts00re2025"
+  key    = "lambda_function_nodependencies.zip"
+}
