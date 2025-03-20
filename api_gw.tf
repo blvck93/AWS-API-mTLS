@@ -84,11 +84,11 @@ resource "aws_api_gateway_integration_response" "MyIntegration" {
   depends_on = [aws_api_gateway_integration.alb_integration]
 }
 
-#resource "aws_api_gateway_vpc_link" "vpc_nlb" {
+# resource "aws_api_gateway_vpc_link" "vpc_nlb" {
 #  name               = "vpc-to-nlb"
 #  description        = "VPC Link for API Gateway to reach NLB"
 #  target_arns        = [aws_lb.nlb.arn]
-#}
+# }
 
 resource "aws_api_gateway_deployment" "deploy" {
   rest_api_id = aws_api_gateway_rest_api.api.id
