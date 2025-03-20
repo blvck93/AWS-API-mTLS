@@ -56,16 +56,16 @@ resource "aws_api_gateway_integration" "alb_integration" {
     "integration.request.header.cert-thumbprint" = "context.authorizer.certThumbprint"
   }
 
-  request_templates = {
-    "application/json" = <<EOF
-{
-    "body": $input.json('$'),
-    "headers": {
-        "X-Client-Cert-Thumbprint": "$context.authorizer.certThumbprint"
-    }
-}
-EOF
-  }
+#   request_templates = {
+#     "application/json" = <<EOF
+# {
+#     "body": $input.json('$'),
+#     "headers": {
+#         "X-Client-Cert-Thumbprint": "$context.authorizer.certThumbprint"
+#     }
+# }
+# EOF
+#   }
 }
 
 resource "aws_api_gateway_method_response" "response_200" {
